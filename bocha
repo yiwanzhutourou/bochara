@@ -1,0 +1,78 @@
+#!/bin/bash
+
+case "$1" in
+    "up")
+    git submodule init
+    git submodule update
+    git submodule foreach --recursive git pull origin master
+    cd laradock
+    docker-compose up -d mysql nginx phpmyadmin workspace
+    ;;
+    "start")
+    cd laradock
+    docker-compose start
+    ;;
+    "stop")
+    cd laradock
+    docker-compose stop
+    ;;
+    "restart")
+    cd laradock
+    docker-compose restart
+    ;;
+    "update")
+    git submodule foreach --recursive git pull origin master
+    cd laradock
+    docker-compose up -d nginx
+    ;;
+    "ps")
+    cd laradock
+    docker-compose ps
+    ;;
+    "enter")
+    cd laradock
+    docker-compose exec workspace bash
+    ;;
+    "composer")
+    cd laradock
+    docker-compose exec workspace composer install
+    ;;
+    "cacheClear")
+    cd laradock
+    docker-compose exec workspace php artisan route:clear
+    ;;
+    "createCache")
+    cd laradock
+    docker-compose exec workspace php artisan route:cache
+    ;;
+    "worker")
+    git submodule init
+    git submodule update
+    git submodule foreach --recursive git pull origin master
+    cd laradock
+    docker-compose up -d php-worker
+    ;;
+    "cronJob")
+    cd laradock
+    docker-compose exec workspace * * * * * php /var/www/artisan schedule:run >> /dev/null 2>&1
+    ;;
+    *)
+    if [ -n "$1" ]
+    then
+        echo -e "\nUnknown command \"$1\"."
+    fi
+    echo "
+Usage:
+    bash bocha [command]
+Commands:
+    up: 构建并启动服务
+    start：启动服务
+    stop：关闭服务
+    restart：重启服务
+    update: 更新docker环境配置
+    ps: 显示当前容器状态
+    enter: 进入到laravel容器
+    composer: 执行composer install
+"
+    ;;
+esac
