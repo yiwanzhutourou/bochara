@@ -1,15 +1,13 @@
-let mix = require('laravel-mix');
+const { mix } = require('laravel-mix')
+const program = require('./mix/program')
+require('./mix/webpack.config')(mix, program)
+const {cssEntries, jsEntries} = require('./mix/entries')(program)
 
-/*
- |--------------------------------------------------------------------------
- | Mix Asset Management
- |--------------------------------------------------------------------------
- |
- | Mix provides a clean, fluent API for defining some Webpack build steps
- | for your Laravel application. By default, we are compiling the Sass
- | file for the application as well as bundling up all the JS files.
- |
- */
+jsEntries.forEach((oneItem) => {
+	mix.js(oneItem.entry, oneItem.output)
+})
 
-mix.js('resources/assets/js/app.js', 'public/js')
-   .sass('resources/assets/sass/app.scss', 'public/css');
+cssEntries.forEach((oneItem) => {
+	mix.stylus(oneItem.entry, oneItem.output)
+})
+
