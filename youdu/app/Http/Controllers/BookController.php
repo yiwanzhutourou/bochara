@@ -19,7 +19,7 @@ class BookController extends Controller {
     public function index(Request $request) {
         $isbn = $request->input('isbn');
         if (!$isbn) {
-            return ErrorUtils::invalidParameterResponseGenerator('缺少参数 isbn');
+            return ErrorUtils::invalidParameterResponse('缺少参数 isbn');
         }
         $book = Book::find($isbn);
         return response()->json(DoubanFormatter::bookDetail($book));

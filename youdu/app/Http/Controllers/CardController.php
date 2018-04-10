@@ -18,7 +18,7 @@ class CardController extends Controller {
     public function index(Request $request) {
         $id = $request->input('id');
         if (!$id) {
-            return ErrorUtils::invalidParameterResponseGenerator('缺少参数 isbn');
+            return ErrorUtils::invalidParameterResponse('缺少参数 isbn');
         }
         $card = Card::find($id);
         return response()->json([

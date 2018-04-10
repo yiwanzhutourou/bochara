@@ -15,5 +15,6 @@ Route::get('/', function () {
     return view('welcome');
 });
 Route::match(['get', 'post'], '/m/{action?}', 'MobileController');
-Route::match(['get', 'post'], '/api/book/{action?}', 'BookController');
-Route::match(['get', 'post'], '/api/card/{action?}', 'CardController');
+Route::match(['get', 'post'], '/api/{action?}', 'ApiController');
+Route::match(['get', 'post'], '/v2/book/{action?}', 'BookController');
+Route::match(['get', 'post'], '/v2/card/{action?}', 'CardController');
