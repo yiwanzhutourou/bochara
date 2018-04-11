@@ -2,11 +2,12 @@
 
 namespace App\Utils;
 
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Response;
 
 class ErrorUtils {
 
-    public static function apiErrorResponse($jsonData, $errCode): Response {
+    public static function apiErrorResponse($jsonData, $errCode): JsonResponse {
         return response()->json($jsonData, $errCode);
     }
 

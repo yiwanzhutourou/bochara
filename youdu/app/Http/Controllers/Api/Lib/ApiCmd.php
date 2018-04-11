@@ -15,29 +15,25 @@ class ApiCmd {
     /**
      * ApiCmd constructor.
      *
-     * @param $uri
+     * @param $action
      * @param $requestData
      * @param $method
      * @throws Exception
      */
-    public function __construct($uri, $requestData, $method) {
-        $this->parseApiName($uri);
+    public function __construct($action, $requestData, $method) {
+        $this->parseApiName($action);
         $this->requestData = $requestData;
         $this->method = $method;
     }
 
     /**
-     * @param $uri
+     * @param $action
      * @throws Exception
      */
-    private function parseApiName($uri) {
-        $paths = array_slice(explode('/', ltrim($uri, '/')), 1);
-        if (count($paths) == 1) { //uri /api/User.addBook/
-            if (count(explode('.', $paths[0])) == 2) {
-                $name = $paths[0];
-                $this->name = $name;
-                return;
-            }
+    private function parseApiName($action) {
+        if (count(explode('.', $action)) == 2) {
+            $this->name = $action;
+            return;
         }
         throw new Exception(Exception::INVALID_COMMAND);
     }

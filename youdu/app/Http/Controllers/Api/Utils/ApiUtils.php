@@ -17,7 +17,7 @@ class ApiUtils {
     public static function api($api_name, $data, $callContext = null) {
         list($className, $method) = explode('.', trim($api_name));
         $className = ucfirst($className);
-        $class = "Api\\{$className}";
+        $class = "App\\Http\\Controllers\\Api\\{$className}";
 
         // check class
         $api = self::apiCheckClass($class);

@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Http\Controllers\Api\Exceptions\Exception;
 use App\Http\Controllers\Api\Exceptions\NeedRedirectException;
 use App\Http\Controllers\Api\Lib\ApiCmd;
+use App\Http\Controllers\Api\Lib\Visitor;
 use App\Utils\ErrorUtils;
 use Illuminate\Http\Request;
 
@@ -57,8 +58,14 @@ class ApiController extends Controller {
         // 检查平台
         $platform = $request->header('BOCHA-PLATFORM');
         // 目前仅支持微信小程序
-        if (empty($platform) || $platform !== 'wx-mp') {
-            throw new NeedRedirectException('//www.youdushufang.com/');
+//        if (empty($platform) || $platform !== 'wx-mp') {
+//            throw new NeedRedirectException('//www.youdushufang.com/');
+//        }
+        // 验证token
+        $token = $request->header('BOCHA-USER-TOKEN');
+        if ($token) {
+            // TODO set user
+            Visitor::instance()->setUser(null);
         }
     }
 }

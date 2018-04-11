@@ -2,8 +2,6 @@
 
 namespace App\Http\Controllers\Api\Exceptions;
 
-use App\Utils\JsonUtils;
-
 class Exception extends \Exception {
 
     const INTERNAL_ERROR = 1001;
@@ -37,10 +35,10 @@ class Exception extends \Exception {
     }
 
     public function output() {
-        return JsonUtils::json_stringify([
-                                  'error' => $this->getCode(),
-                                  'message' => $this->getMessage(),
-                                  'ext' => $this->ext,
-                              ]);
+        return [
+            'error' => $this->getCode(),
+            'message' => $this->getMessage(),
+            'ext' => $this->ext,
+        ];
     }
 }
