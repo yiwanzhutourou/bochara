@@ -2,8 +2,8 @@
 
 namespace App\Utils;
 
+use App\Http\Controllers\Api\Exceptions\Exception;
 use Illuminate\Http\JsonResponse;
-use Illuminate\Http\Response;
 
 class ErrorUtils {
 
@@ -11,7 +11,12 @@ class ErrorUtils {
         return response()->json($jsonData, $errCode);
     }
 
-    public static function invalidParameterResponse(string $hint): Response {
-        return response($hint, 422);
+    public static function errorResponse(string $hint,
+                                         $errCode = Exception::PARAMETERS_MISSING): JsonResponse {
+        return response()->json([
+            'error' => $errCode,
+            'message' => $hint,
+            'ext' => '',
+        ], 422);
     }
 }

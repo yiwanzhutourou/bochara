@@ -3,13 +3,13 @@
 namespace App\Http\Controllers\Api\Lib;
 
 use App\Http\Controllers\Api\Exceptions\Exception;
-use App\User;
+use App\Models\MUser;
 
 class Visitor {
     private static $instance = null;
 
     /**
-     * @var User
+     * @var MUser
      */
     private $user = null;
 
@@ -28,7 +28,7 @@ class Visitor {
     }
 
     /**
-     * @return User
+     * @return MUser
      */
     public function getUser() {
         return $this->user;

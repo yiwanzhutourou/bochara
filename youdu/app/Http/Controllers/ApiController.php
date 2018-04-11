@@ -6,6 +6,7 @@ use App\Http\Controllers\Api\Exceptions\Exception;
 use App\Http\Controllers\Api\Exceptions\NeedRedirectException;
 use App\Http\Controllers\Api\Lib\ApiCmd;
 use App\Http\Controllers\Api\Lib\Visitor;
+use App\Models\MUser;
 use App\Utils\ErrorUtils;
 use Illuminate\Http\Request;
 
@@ -21,12 +22,13 @@ class ApiController extends Controller {
         } catch (NeedRedirectException $e) {
             return redirect($e->url, $e->status);
         } catch (\Exception $e) {
-            return ErrorUtils::apiErrorResponse([
-                                                    'error' => 500,
-                                                    // 'message' => $e->getMessage(),
-                                                    'message' => '服务器发生错误了~',
-                                                    'ext' => '',
-                                                ], 500);
+            return ErrorUtils::apiErrorResponse(
+                [
+                    'error' => 500,
+                    'message' => $e->getMessage(),
+                    // 'message' => '服务器发生错误了~',
+                    'ext' => '',
+                ], 500);
         }
     }
 
@@ -64,8 +66,8 @@ class ApiController extends Controller {
         // 验证token
         $token = $request->header('BOCHA-USER-TOKEN');
         if ($token) {
-            // TODO set user
-            Visitor::instance()->setUser(null);
+            $user = MUser::where('token', '=', $token)->first();
+            Visitor::instance()->setUser($user);
         }
     }
 }

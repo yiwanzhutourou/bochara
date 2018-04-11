@@ -3,24 +3,24 @@
 namespace App\Models;
 
 /**
- * App\Models\Book
+ * App\Models\MBook
  *
  * @mixin \Eloquent
  * @property mixed isbn
  * @property mixed title
  * @property mixed author
  * @property mixed cover
- * @property mixed bigCover
+ * @property mixed big_cover
  * @property mixed publisher
- * @property mixed trueIsbn
+ * @property mixed true_isbn
  * @property mixed summary
- * @property mixed doubanAverage
- * @property mixed doubanRaters
+ * @property mixed douban_average
+ * @property mixed douban_raters
  * @property mixed rating
  * @property mixed subtitle
- * @property mixed pubDate
+ * @property mixed pub_date
  * @property mixed tags
- * @property mixed originTitle
+ * @property mixed origin_title
  * @property mixed binding
  * @property mixed translator
  * @property mixed catalog
@@ -29,16 +29,19 @@ namespace App\Models;
  * @property mixed alt
  * @property mixed isbn10
  * @property mixed url
- * @property mixed altTitle
- * @property mixed authorIntro
+ * @property mixed alt_title
+ * @property mixed author_intro
  * @property mixed series
  * @property mixed price
  */
-class Book extends \Eloquent {
+class MBook extends \Eloquent {
 
     // table name
     protected $table = 'bocha_book';
 
     // primary key
     protected $primaryKey = 'isbn';
+    public $incrementing = false;
+
+    public $timestamps = false;
 }
