@@ -15,6 +15,11 @@ namespace App\Models;
  */
 class MDiscoverFlow extends \Eloquent {
 
+    const DISCOVER_ITEM_NEW = 0;
+    const DISCOVER_ITEM_APPROVED = 1;
+    const DISCOVER_ITEM_DENIED = 2;
+    const DISCOVER_ITEM_USER_DELETED = 3;
+
     // table name
     protected $table = 'bocha_discover_flow';
 
