@@ -8,7 +8,7 @@ namespace App\Models;
  * @mixin \Eloquent
  * @property mixed id
  * @property mixed user_id
- * @property mixed name
+ * @property mixed address
  * @property mixed detail
  * @property mixed longitude
  * @property mixed latitude

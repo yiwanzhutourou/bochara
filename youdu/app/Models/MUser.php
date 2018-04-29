@@ -23,12 +23,20 @@ class MUser extends \Eloquent {
 
     public $timestamps = false;
 
+    public function info() {
+        return $this->belongsTo(MUserInfo::class, 'user_id');
+    }
+
     public function addresses() {
         return $this->hasMany(MUserAddress::class, 'user_id');
     }
 
     public function userBooks() {
         return $this->hasMany(MUserBook::class, 'user_id');
+    }
+
+    public function bookCount() {
+        return $this->hasMany(MUserBook::class, 'user_id')->count();
     }
 
     public function cards() {
