@@ -13,10 +13,7 @@ class Haribo extends ApiBase {
      * @throws Exceptions\Exception
      */
     public function clearUser() {
-        Visitor::instance()->checkAuth(true);
-
-        $user = Visitor::instance()->getUser();
-
+        $user = Visitor::instance()->checkAuth(true);
         // clear all addresses
         $user->addresses()->delete();
         // clear info

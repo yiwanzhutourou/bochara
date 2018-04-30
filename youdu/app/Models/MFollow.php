@@ -17,4 +17,8 @@ class MFollow extends \Eloquent {
     protected $table = 'bocha_follow';
 
     public $timestamps = false;
+
+    protected $fillable = [
+        'from_id', 'to_id', 'create_time',
+    ];
 }

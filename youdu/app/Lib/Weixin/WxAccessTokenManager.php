@@ -25,7 +25,6 @@ class WxAccessTokenManager {
 
     /**
      * @return string|bool
-     * @throws Exception
      */
     public function getAccessToken() {
         if (!empty($this->access_token) && $this->tokenValid()) {
@@ -50,8 +49,8 @@ class WxAccessTokenManager {
 
             $response = json_decode(file_get_contents($url));
             if (!empty($response->errcode)) {
-                throw new Exception(Exception::WEIXIN_AUTH_FAILED,
-                    '微信验证出错: ' . $response->errmsg);
+                // TODO log 一下错误
+                return false;
             }
 
             if (!empty($response->access_token)) {

@@ -20,7 +20,7 @@ class BookFormatter {
         return [];
     }
 
-    private static function parseAuthor($authorString) {
+    public static function parseAuthor($authorString) {
         if (empty($authorString)) {
             return '';
         }

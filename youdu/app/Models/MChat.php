@@ -23,4 +23,9 @@ class MChat extends \Eloquent {
     protected $table = 'bocha_chat';
 
     public $timestamps = false;
+
+    protected $fillable = [
+        'user_1', 'user_2', 'msg_content', 'msg_sender', 'msg_type',
+        'status', 'timestamp', 'extra', 'unread_count',
+    ];
 }

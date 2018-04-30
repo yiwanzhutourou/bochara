@@ -35,9 +35,8 @@ class Youdu extends ApiBase {
      * @throws Exceptions\Exception
      */
     public function cardApprove($cardId) {
-        Visitor::instance()->checkAuth();
-
-        $userId = intval(Visitor::instance()->getUserId());
+        $user = Visitor::instance()->checkAuth();
+        $userId = $user->id;
         if ($userId !== 34 && $userId !== 35) {
             throw new Exception(Exception::AUTH_FAILED, '没有权限~');
         }
@@ -67,9 +66,8 @@ class Youdu extends ApiBase {
      * @throws Exceptions\Exception
      */
     public function cardDecline($cardId) {
-        Visitor::instance()->checkAuth();
-
-        $userId = intval(Visitor::instance()->getUserId());
+        $user = Visitor::instance()->checkAuth();
+        $userId = $user->id;
         if ($userId !== 34 && $userId !== 35) {
             throw new Exception(Exception::AUTH_FAILED, '没有权限~');
         }

@@ -27,4 +27,10 @@ class MBorrowHistory extends \Eloquent {
     protected $table = 'bocha_borrow_history';
 
     public $timestamps = false;
+
+    protected $fillable = [
+        'from_user', 'to_user',
+        'book_isbn', 'book_title', 'book_cover',
+        'date', 'status', 'form_id',
+    ];
 }

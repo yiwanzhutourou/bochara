@@ -7,7 +7,7 @@ use App\Models\MBook;
 use App\Models\MCard;
 use App\Models\MCardApproval;
 use App\Models\MUser;
-use App\Utils\ImageUtils;
+use App\Utils\CommonUtils;
 
 class CardFormatter {
     public static function detail(MCard $card, ?MUser $user,
@@ -33,7 +33,7 @@ class CardFormatter {
             'user'          => UserFormatter::simple($user),
             'title'         => $card->title,
             'content'       => $card->content,
-            'picUrl'        => ImageUtils::getOriginalImgUrl($card->pic_url),
+            'picUrl'        => CommonUtils::getOriginalImgUrl($card->pic_url),
             'book'          => BookFormatter::simple($book),
             'createTime'    => $card->create_time,
             'isMe'          => Visitor::instance()->isMe($card->user_id),

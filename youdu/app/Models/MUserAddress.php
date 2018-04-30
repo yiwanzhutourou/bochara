@@ -19,4 +19,9 @@ class MUserAddress extends \Eloquent {
     protected $table = 'bocha_user_address';
 
     public $timestamps = false;
+
+    protected $fillable = [
+        'user_id', 'address', 'detail',
+        'longitude', 'latitude', 'city',
+    ];
 }

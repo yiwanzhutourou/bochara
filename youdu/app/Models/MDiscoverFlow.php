@@ -24,4 +24,6 @@ class MDiscoverFlow extends \Eloquent {
     protected $table = 'bocha_discover_flow';
 
     public $timestamps = false;
+
+    protected $fillable = ['type', 'content_id', 'user_id', 'status', 'create_time'];
 }

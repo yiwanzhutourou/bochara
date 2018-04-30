@@ -13,7 +13,7 @@ class AliSmsSender {
         $sms = new AliSms();
         $response = $sms->sendSms(
             $phoneNumber, 'SMS_76385138', $params);
-        if (!$response && $response->Code === 'OK') {
+        if ($response && $response->Code === 'OK') {
             return true;
         }
         // TODO 通知一下，防止线上大量短信发送失败
@@ -27,7 +27,7 @@ class AliSmsSender {
         $sms = new AliSms();
         $response = $sms->sendSms(
             $phoneNumber, 'SMS_76440167', $params);
-        if (!$response && $response->Code === 'OK') {
+        if ($response && $response->Code === 'OK') {
             return true;
         }
         return false;
@@ -40,7 +40,7 @@ class AliSmsSender {
         $sms = new AliSms();
         $response = $sms->sendSms(
             $phoneNumber, 'SMS_89945049', $params);
-        if (!$response && $response->Code === 'OK') {
+        if ($response && $response->Code === 'OK') {
             return true;
         }
         return false;

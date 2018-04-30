@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Api\Lib;
 
 use App\Http\Controllers\Api\Exceptions\Exception;
 use App\Models\MUser;
+use App\Models\MUserBook;
 
 class Visitor {
     private static $instance = null;
@@ -46,7 +47,12 @@ class Visitor {
     }
 
     public function hasBook($isbn) {
-        // TODO
+        if ($this->user != null) {
+            $userId = $this->user->id;
+            return MUserBook::where(['user_id' => $userId,
+                    'isbn' => $isbn])->count() > 0;
+        }
+
         return false;
     }
 
@@ -60,6 +66,7 @@ class Visitor {
 
     /**
      * @param bool $skipMobile
+     * @return MUser
      * @throws Exception
      */
     public function checkAuth($skipMobile = false) {
@@ -69,5 +76,6 @@ class Visitor {
             if (!$this->hasMobile())
                 throw new Exception(Exception::AUTH_FAILED_NO_MOBILE, '未绑定手机号');
         }
+        return $this->getUser();
     }
 }

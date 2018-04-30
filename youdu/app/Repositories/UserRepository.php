@@ -2,6 +2,7 @@
 
 namespace App\Repositories;
 
+use App\Models\MFollow;
 use App\Models\MUser;
 use App\Models\MUserAddress;
 use App\Utils\CommonUtils;
@@ -25,11 +26,12 @@ class UserRepository {
         /** @var MUserAddress $address */
         foreach ($addressList as $address) {
             $addressItem = [
-                'latitude' => $address->latitude,
+                'id'        => $address->id,
+                'latitude'  => $address->latitude,
                 'longitude' => $address->longitude,
-                'name' => $address->address,
-                'detail' => $address->detail,
-                'city' => json_decode($address->city),
+                'name'      => $address->address,
+                'detail'    => $address->detail,
+                'city'      => json_decode($address->city),
             ];
 
             if ($hasPoi) {
@@ -45,6 +47,10 @@ class UserRepository {
             });
         }
         return $addresses;
+    }
+
+    public static function isFollowing($from, $to) {
+        return MFollow::where(['from_id' => $from, 'to_id' => $to])->count() > 0;
     }
 
     /**

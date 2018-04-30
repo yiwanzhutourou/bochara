@@ -2,7 +2,10 @@
 
 namespace App\Formatters;
 
+use App\Models\MBook;
+use App\Models\MCard;
 use App\Models\MUser;
+use App\Utils\CommonUtils;
 
 class UserFormatter {
 
@@ -32,9 +35,27 @@ class UserFormatter {
                 }
             }
         }
-        return [
-            'name'    => '',
-            'contact' => ''
-        ];
+        return [];
+    }
+
+    public static function cardList($cards) {
+        $formattedCards = [];
+        if ($cards) {
+            /** @var MCard $card */
+            foreach ($cards as $card) {
+                if ($card->book_isbn) {
+                    $book = MBook::find($card->book_isbn);
+                }
+                $formattedCards[] = [
+                    'id'         => $card->id,
+                    'title'      => $card->title,
+                    'content'    => mb_substr($card->content, 0, 48, 'utf-8'),
+                    'picUrl'     => CommonUtils::getListThumbnailUrl($card->pic_url),
+                    'bookTitle'  => $book->title ?? '',
+                    'createTime' => $card->create_time,
+                ];
+            }
+        }
+        return $formattedCards;
     }
 }

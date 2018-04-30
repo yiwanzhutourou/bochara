@@ -19,7 +19,12 @@ namespace App\Models;
 class MCardPulp extends \Eloquent {
 
     // table name
-    protected $table = 'bocha_book';
+    protected $table = 'bocha_book_card_pulp';
 
     public $timestamps = false;
+
+    protected $fillable = [
+        'user_id', 'title', 'content', 'pic_url', 'create_time',
+        'pulp_rate', 'pulp_label', 'pulp_review',
+    ];
 }
