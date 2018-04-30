@@ -168,4 +168,38 @@ class MUser extends \Eloquent {
             ->where('status', '<', 3)
             ->orderByDesc('history_id');
     }
+
+    // TODO 历史原因，分了一张新表，有空整理一下这块
+    public function newBorrowRequests($status, $out = false) {
+        $queryBuilder = DB::table('bocha_borrow_request')
+            ->select([
+                'bocha_borrow_request.id as request_id',
+                'bocha_borrow_request.from_user',
+                'bocha_borrow_request.to_user',
+                'bocha_borrow_request.create_time',
+                'bocha_borrow_request.status',
+                'bocha_user.id as user_id',
+                'bocha_user.nickname',
+                'bocha_user.avatar',
+                'bocha_book.isbn',
+                'bocha_book.title',
+                'bocha_book.author',
+                'bocha_book.cover',
+                'bocha_book.publisher',
+            ]);
+        if ($out) {
+            $queryBuilder->where(['from_user' => $this->id])
+                ->join('bocha_user',
+                    'bocha_borrow_request.to_user', '=', 'bocha_user.id');
+        } else {
+            $queryBuilder->where(['to_user' => $this->id])
+                ->join('bocha_user',
+                    'bocha_borrow_request.from_user', '=', 'bocha_user.id');
+        }
+        return $queryBuilder
+            ->join('bocha_book',
+                'bocha_borrow_request.book_isbn', '=', 'bocha_book.isbn')
+            ->where('status', '=', $status)
+            ->orderByDesc('request_id');
+    }
 }

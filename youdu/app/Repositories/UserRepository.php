@@ -5,6 +5,7 @@ namespace App\Repositories;
 use App\Models\MFollow;
 use App\Models\MUser;
 use App\Models\MUserAddress;
+use App\Models\MUserBook;
 use App\Utils\CommonUtils;
 
 class UserRepository {
@@ -51,6 +52,10 @@ class UserRepository {
 
     public static function isFollowing($from, $to) {
         return MFollow::where(['from_id' => $from, 'to_id' => $to])->count() > 0;
+    }
+
+    public static function hasBook($userId, $isbn) {
+        return MUserBook::where(['user_id' => $userId, 'isbn' => $isbn])->count() > 0;
     }
 
     /**
