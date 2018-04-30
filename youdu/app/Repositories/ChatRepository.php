@@ -4,6 +4,7 @@ namespace App\Repositories;
 
 use App\Models\MChat;
 use App\Models\MChatMessage;
+use App\Models\MUser;
 use App\Utils\JsonUtils;
 
 class ChatRepository {
@@ -121,5 +122,113 @@ class ChatRepository {
             'user_1' => $user1,
             'user_2' => $user2,
         ])->update(['unread_count' => 0]);
+    }
+
+    public static function deleteChatMessage($user1, $user2, $timestamp) {
+        // user1 要删除和 user2 的之间的消息
+
+        // user1 发送给 user2 的消息，status1 字段标记为删除（发送方）
+        // 这里不用判断时间戳直接都删除，因为不存在误删未读消息的情况
+        MChatMessage::where([
+            'user_1' => $user1,
+            'user_2' => $user2,
+        ])->update(['status_1' => MChatMessage::MSG_STATUS_DELETED]);
+
+        // user2 发送给 user1 的消息，status2 字段标记为删除（接收方）
+        MChatMessage::where(['user_1' => $user2, 'user_2' => $user1])
+            ->where('timestamp', '<', intval($timestamp))
+            ->update(['status_2' => MChatMessage::MSG_STATUS_DELETED]);
+
+        // 同时更新chat表
+        // （不知道是不是想复杂了）因为在删除的时间点之后 user2 可能又发了消息过来,
+        // 所以在更新完 message 表之后还应该去查询一下是否有 user2 发过来的没被删除的新消息
+        $newMessageCount = MChatMessage::where([
+            'user_1'   => $user2,
+            'user_2'   => $user1,
+            'status_2' => MChatMessage::MSG_STATUS_NORMAL,
+
+        ])->count();
+        if ($newMessageCount <= 0) {
+            // 没有新消息，直接把这条 chat 的状态标记为删除
+            MChat::where([
+                'user_1' => $user1,
+                'user_2' => $user2,
+            ])->update([
+                'status'       => MChatMessage::MSG_STATUS_DELETED,
+                'unread_count' => 0,
+            ]);
+        } else {
+            $newMessage = MChatMessage::where([
+                'user_1'   => $user2,
+                'user_2'   => $user1,
+                'status_2' => MChatMessage::MSG_STATUS_NORMAL,
+
+            ])->first();
+            MChat::where([
+                'user_1' => $user1,
+                'user_2' => $user2,
+            ])->update([
+                'msg_content'  => $newMessage->msg_content,
+                'msg_sender'   => $newMessage->user_1,
+                'msg_type'     => $newMessage->msg_type,
+                'status'       => MChatMessage::MSG_STATUS_NORMAL,
+                'timestamp'    => $newMessage->timestamp,
+                'unread_count' => $newMessageCount,
+                'extra'        => $newMessage->extra,
+            ]);
+        }
+    }
+
+    public static function createSystemUser() {
+        $systemUser = new MUser();
+        $systemUser->id = self::BOCHA_SYSTEM_USER_ID;
+        $systemUser->nickname = '有读书房';
+        $systemUser->avatar = 'http://othb16dht.bkt.clouddn.com/Fm3qYpsmNFGRDbWeTOQDRDfiJz9l?imageView2/1/w/640/h/640/format/jpg/q/75|imageslim';
+        return $systemUser;
+    }
+
+    public static function createMessage($message) {
+        if (!$message) {
+            return [];
+        }
+        /** @var MChatMessage $message */
+        switch ($message->msg_type) {
+            case MChatMessage::MSG_TYPE_TEXT:
+                return [
+                    'type'      => 'message',
+                    'from'      => $message->user_1,
+                    'to'        => $message->user_2,
+                    'content'   => $message->msg_content,
+                    'timeStamp' => $message->timestamp,
+                ];
+            case MChatMessage::MSG_TYPE_BORROW:
+            case MChatMessage::MSG_TYPE_CONTACT:
+            case MChatMessage::MSG_TYPE_SYSTEM:
+                $extra = json_decode($message->extra);
+                return [
+                    'type'      => 'system',
+                    'from'      => $message->user_1,
+                    'to'        => $message->user_2,
+                    'content'   => $message->msg_content,
+                    'timeStamp' => $message->timestamp,
+                    'extra'     => $extra,
+                ];
+            default:
+                return [
+                    'type' => 'unknown',
+                    'from' => $message->user_1,
+                    'to'   => $message->user_2,
+                ];
+        }
+    }
+
+    public static function createFakeMessage() {
+        return [
+            'type'      => 'fake_hint',
+            'from'      => '',
+            'to'        => '',
+            'content'   => '提示：有读书房的留言并不是及时聊天，你可以尝试点击刷新来获取更新的消息',
+            'timeStamp' => '',
+        ];
     }
 }

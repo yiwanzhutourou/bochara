@@ -736,7 +736,7 @@ class User extends ApiBase {
      */
     public function borrowBook($toUser, $isbn, $formId) {
         $self = Visitor::instance()->checkAuth();
-        if ($toUser === $self->id) {
+        if (intval($toUser) === $self->id) {
             throw new Exception(Exception::BAD_REQUEST , '不可以借自己的书哦~');
         }
 

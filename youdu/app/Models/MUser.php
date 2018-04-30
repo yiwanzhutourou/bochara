@@ -202,4 +202,10 @@ class MUser extends \Eloquent {
             ->where('status', '=', $status)
             ->orderByDesc('request_id');
     }
+
+    public function chats() {
+        return $this->hasMany(MChat::class, 'user_1')
+            ->where(['status' => MChatMessage::MSG_STATUS_NORMAL])
+            ->orderByDesc('timestamp');
+    }
 }
