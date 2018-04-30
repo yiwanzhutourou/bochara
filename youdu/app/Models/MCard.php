@@ -28,6 +28,11 @@ class MCard extends \Eloquent {
 
     public $timestamps = false;
 
+    protected $fillable = [
+        'user_id', 'title', 'content', 'pic_url',
+        'book_isbn', 'create_time', 'status', 'read_count',
+    ];
+
     public function user() {
         return $this->belongsTo(MUser::class);
     }
@@ -38,5 +43,9 @@ class MCard extends \Eloquent {
 
     public function approvals() {
         return $this->hasMany(MCardApproval::class, 'card_id');
+    }
+
+    public function approvalCount() {
+        return $this->hasMany(MCardApproval::class, 'card_id')->count();
     }
 }

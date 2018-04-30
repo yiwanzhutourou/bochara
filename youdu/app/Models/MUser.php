@@ -61,7 +61,7 @@ class MUser extends \Eloquent {
     public function cards() {
         return $this->hasMany(MCard::class, 'user_id')
             ->where(['status' => MCard::CARD_STATUS_NORMAL])
-            ->orderBy('id', 'desc');
+            ->orderByDesc('create_time');
     }
 
     public function cardCount() {

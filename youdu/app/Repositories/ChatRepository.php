@@ -8,6 +8,8 @@ use App\Utils\JsonUtils;
 
 class ChatRepository {
 
+    const BOCHA_SYSTEM_USER_ID = 0;
+
     public static function sendRequest($from, $to, $request) {
         // update both user in chat table
         self::updateChat(
@@ -60,9 +62,8 @@ class ChatRepository {
         ];
 
         $adminIds = ['34', '35'];
-        $systemId = config('youdu.bocha_system_user_id');
         foreach ($adminIds as $adminId) {
-            self::sendSystemMessage($systemId, $adminId,
+            self::sendSystemMessage(self::BOCHA_SYSTEM_USER_ID, $adminId,
                 "[系统消息] 用户 {$nickname} 发布了一个新的读书卡片: {$card->title}。",
                 JsonUtils::json_stringify($extra));
         }
@@ -75,9 +76,8 @@ class ChatRepository {
         ];
 
         $adminIds = ['34', '35'];
-        $systemId = config('youdu.bocha_system_user_id');
         foreach ($adminIds as $adminId) {
-            self::sendSystemMessage($systemId, $adminId,
+            self::sendSystemMessage(self::BOCHA_SYSTEM_USER_ID, $adminId,
                 "[系统消息] 用户 {$nickname} 修改了一个读书卡片: {$card->title}。",
                 JsonUtils::json_stringify($extra));
         }

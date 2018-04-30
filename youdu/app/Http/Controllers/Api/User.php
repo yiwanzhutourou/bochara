@@ -881,9 +881,8 @@ class User extends ApiBase {
             'router' => 'follower',
         ];
         // 给被关注的同志发一条系统消息
-        $systemId = config('youdu.bocha_system_user_id');
-        ChatRepository::sendSystemMessage($systemId, $toUser,
-            "书友 {$self->nickname} 关注了你~",
+        ChatRepository::sendSystemMessage(ChatRepository::BOCHA_SYSTEM_USER_ID,
+            $toUser, "书友 {$self->nickname} 关注了你~",
             JsonUtils::json_stringify($extra));
 
         return 'ok';

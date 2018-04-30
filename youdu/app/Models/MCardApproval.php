@@ -18,4 +18,8 @@ class MCardApproval extends \Eloquent {
     protected $table = 'bocha_book_card_approval';
 
     public $timestamps = false;
+
+    protected $fillable = [
+        'user_id', 'card_id', 'create_time', 'user_avatar',
+    ];
 }
