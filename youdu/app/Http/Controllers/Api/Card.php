@@ -197,7 +197,7 @@ class Card extends ApiBase {
         }
         $userId = $user->id;
         try {
-            MCardApproval::create([
+            MCardApproval::where([
                 'card_id' => $cardId,
                 'user_id' => $userId,
             ])->delete();

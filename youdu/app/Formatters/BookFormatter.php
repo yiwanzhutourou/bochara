@@ -17,7 +17,7 @@ class BookFormatter {
             ];
         }
 
-        return [];
+        return null;
     }
 
     public static function parseAuthor($authorString) {
