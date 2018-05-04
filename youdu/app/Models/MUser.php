@@ -35,7 +35,7 @@ class MUser extends \Eloquent {
 
     public function books() {
         return $this->hasMany(MUserBook::class, 'user_id')
-            ->join('bocha_book',
+            ->leftJoin('bocha_book',
                 'bocha_user_book.isbn', '=', 'bocha_book.isbn')
             ->orderBy('create_time', 'desc');
     }
@@ -43,7 +43,7 @@ class MUser extends \Eloquent {
     public function borrowBooks() {
         return $this->hasMany(MUserBook::class, 'user_id')
             ->where(['can_be_borrowed' => MUserBook::BOOK_CAN_BE_BORROWED])
-            ->join('bocha_book',
+            ->leftJoin('bocha_book',
                 'bocha_user_book.isbn', '=', 'bocha_book.isbn')
             ->orderBy('create_time', 'desc');
     }
@@ -107,7 +107,7 @@ class MUser extends \Eloquent {
             ])
             ->where(['from_user' => $this->id])
             ->where('status', '<', 3)
-            ->join('bocha_user',
+            ->leftJoin('bocha_user',
                 'bocha_borrow_history.to_user', '=', 'bocha_user.id')
             ->orderByDesc('history_id');
     }
@@ -126,7 +126,7 @@ class MUser extends \Eloquent {
             ])
             ->where(['to_user' => $this->id])
             ->where('status', '<', 3)
-            ->join('bocha_user',
+            ->leftJoin('bocha_user',
                 'bocha_borrow_history.from_user', '=', 'bocha_user.id')
             ->orderByDesc('history_id');
     }
@@ -155,15 +155,15 @@ class MUser extends \Eloquent {
             ]);
         if ($out) {
             $queryBuilder->where(['from_user' => $this->id])
-                ->join('bocha_user',
+                ->leftJoin('bocha_user',
                     'bocha_borrow_history.to_user', '=', 'bocha_user.id');
         } else {
             $queryBuilder->where(['to_user' => $this->id])
-                ->join('bocha_user',
+                ->leftJoin('bocha_user',
                     'bocha_borrow_history.from_user', '=', 'bocha_user.id');
         }
         return $queryBuilder
-            ->join('bocha_book',
+            ->leftJoin('bocha_book',
                 'bocha_borrow_history.book_isbn', '=', 'bocha_book.isbn')
             ->where('status', '<', 3)
             ->orderByDesc('history_id');
@@ -189,15 +189,15 @@ class MUser extends \Eloquent {
             ]);
         if ($out) {
             $queryBuilder->where(['from_user' => $this->id])
-                ->join('bocha_user',
+                ->leftJoin('bocha_user',
                     'bocha_borrow_request.to_user', '=', 'bocha_user.id');
         } else {
             $queryBuilder->where(['to_user' => $this->id])
-                ->join('bocha_user',
+                ->leftJoin('bocha_user',
                     'bocha_borrow_request.from_user', '=', 'bocha_user.id');
         }
         return $queryBuilder
-            ->join('bocha_book',
+            ->leftJoin('bocha_book',
                 'bocha_borrow_request.book_isbn', '=', 'bocha_book.isbn')
             ->where('status', '=', $status)
             ->orderByDesc('request_id');

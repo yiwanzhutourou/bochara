@@ -51,7 +51,7 @@ class Map extends ApiBase {
             ->where('latitude', '<', $maxLat)
             ->where('longitude', '>', $minLng)
             ->where('longitude', '<', $maxLng)
-            ->join('bocha_user',
+            ->leftJoin('bocha_user',
                 'bocha_user_address.user_id', '=', 'bocha_user.id')
             ->get();
         $markers = [];
