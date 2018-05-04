@@ -463,9 +463,7 @@ class User extends ApiBase {
         }
 
         // 备份豆瓣图书信息到有读
-        $book = new MBook();
-        DoubanManager::copy($book, $doubanBook);
-        $book->save();
+        $book = DoubanManager::copy($doubanBook);
 
         $user = Visitor::instance()->getUser();
         $hasBook = MUserBook::where(['user_id' => $user->id, 'isbn' => $doubanBook->id])
@@ -478,10 +476,10 @@ class User extends ApiBase {
                 'isbn'            => $book->isbn,
                 'create_time'     => time(),
                 'can_be_borrowed' => MUserBook::BOOK_CAN_BE_BORROWED,
-                'total_count'     => 1,
+                'count'     => 1,
                 'left_count'      => 1, // 暂时默认都是 1 本书
             ]);
-            if (!$userBook) {
+            if ($userBook) {
                 // 检查并添加新图书到发现流
                 DiscoverManager::addNewBookToDiscoverFlow($book, $userBook);
             }

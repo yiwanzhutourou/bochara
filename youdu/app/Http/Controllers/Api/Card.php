@@ -39,9 +39,7 @@ class Card extends ApiBase {
         if (!empty($book)) {
             $doubanBook = json_decode($book);
             if ($doubanBook !== null && !empty($doubanBook->id)) {
-                $bochaBook = new MBook();
-                DoubanManager::copy($bochaBook, $doubanBook);
-                $bochaBook->save();
+                $bochaBook = DoubanManager::copy($doubanBook);
                 $bookIsbn = $bochaBook->isbn;
             }
         }
@@ -296,9 +294,9 @@ class Card extends ApiBase {
             }
             $addresses = UserRepository::getUserAddresses(
                 $user, $latitude, $longitude, true);
-            $userAddress = array_values($addresses)[0];
+            $userAddress = array_values($addresses)[0] ?? null;
             $distanceText = Visitor::instance()->isMe($userBook->user_id) ? ''
-                : (empty($userAddress) ? '' : CommonUtils::getDistanceString($userAddress['distance']));
+                : ($userAddress ? CommonUtils::getDistanceString($userAddress['distance']) : '');
             $userList[] = [
                 'id'           => $user->id,
                 'nickname'     => $user->nickname,
@@ -307,16 +305,18 @@ class Card extends ApiBase {
                 'distanceText' => $distanceText,
             ];
         }
-        // sort: 距离升序排列
-        usort($userList, function($a, $b) {
-            if (empty($a['address'])) {
-                return 1;
-            }
-            if (empty($b['address'])) {
-                return -1;
-            }
-            return ($a['address']['distance'] > $b['address']['distance']) ? 1 : -1;
-        });
+        if (count($userList) > 1) {
+            // sort: 距离升序排列
+            usort($userList, function($a, $b) {
+                if (empty($a['address'])) {
+                    return 1;
+                }
+                if (empty($b['address'])) {
+                    return -1;
+                }
+                return ($a['address']['distance'] > $b['address']['distance']) ? 1 : -1;
+            });
+        }
 
         return [
             'users'   => $userList,

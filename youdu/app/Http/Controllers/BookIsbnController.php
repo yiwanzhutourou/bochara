@@ -32,9 +32,7 @@ class BookIsbnController extends Controller {
                 return ErrorUtils::errorResponse('无法获取图书信息',
                     Exception::RESOURCE_NOT_FOUND);
             } else {
-                $book = new MBook();
-                DoubanManager::copy($book, $doubanBook);
-                $book->save();
+                $book = DoubanManager::copy($doubanBook);
             }
         }
         return response()->json(DoubanFormatter::bookDetail($book));

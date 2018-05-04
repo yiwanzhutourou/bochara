@@ -123,9 +123,7 @@ class ActivityManager {
             return false;
         }
 
-        $book = new MBook();
-        DoubanManager::copy($book, $doubanBook);
-        $book->save();
+        $book = DoubanManager::copy($doubanBook);
         return [
             'type' => 'book',
             'data' => [

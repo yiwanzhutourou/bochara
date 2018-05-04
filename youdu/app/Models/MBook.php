@@ -44,4 +44,12 @@ class MBook extends \Eloquent {
     public $incrementing = false;
 
     public $timestamps = false;
+
+    protected $fillable = [
+        'isbn', 'title', 'author', 'cover', 'big_cover', 'publisher',
+        'true_isbn', 'summary', 'douban_average', 'douban_raters',
+        'rating', 'subtitle', 'pub_date', 'tags', 'origin_title',
+        'binding', 'translator', 'catalog', 'pages', 'images', 'alt',
+        'isbn10', 'url', 'alt_title', 'author_intro', 'series', 'price',
+    ];
 }

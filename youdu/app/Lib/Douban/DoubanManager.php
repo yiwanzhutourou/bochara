@@ -10,11 +10,11 @@ class DoubanManager {
     /**
      * 复制豆瓣信息到有读
      *
-     * @param MBook $book
      * @param DoubanBook $doubanBook
+     * @return \Illuminate\Database\Eloquent\Model
      */
-    public static function copy($book, $doubanBook) {
-        $book->isbn = $doubanBook->id;
+    public static function copy($doubanBook) {
+        $book = new MBook();
         $book->title = $doubanBook->title;
         $book->author = JsonUtils::json_stringify($doubanBook->author);
         $book->cover = $doubanBook->image;
@@ -51,7 +51,10 @@ class DoubanManager {
         $book->url = $doubanBook->url;
         $book->alt_title = $doubanBook->alt_title;
         $book->author_intro = $doubanBook->author_intro;
-        $book->series = JsonUtils::json_stringify($doubanBook->series);
+        $book->series = isset($doubanBook->series) ? JsonUtils::json_stringify($doubanBook->series) : '';
         $book->price = $doubanBook->price;
+
+        return MBook::updateOrCreate(['isbn' => $doubanBook->id],
+            $book->attributesToArray());
     }
 }

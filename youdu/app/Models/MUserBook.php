@@ -11,7 +11,7 @@ namespace App\Models;
  * @property mixed isbn
  * @property mixed create_time
  * @property mixed can_be_borrowed
- * @property mixed total_count
+ * @property mixed count
  * @property mixed left_count
  */
 class MUserBook extends \Eloquent {
@@ -26,6 +26,6 @@ class MUserBook extends \Eloquent {
 
     protected $fillable = [
         'user_id', 'isbn', 'create_time',
-        'can_be_borrowed', 'total_count', 'left_count',
+        'can_be_borrowed', 'count', 'left_count',
     ];
 }
