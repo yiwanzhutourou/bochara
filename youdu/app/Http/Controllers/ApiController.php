@@ -13,6 +13,12 @@ use Illuminate\Http\Request;
 class ApiController extends Controller {
 
     // 兼容老 API：/api/Book.get?id=xxx
+    /**
+     * @param Request $request
+     * @param string $action
+     * @return \Illuminate\Http\JsonResponse|\Illuminate\Http\RedirectResponse|\Illuminate\Routing\Redirector
+     * @throws \Exception
+     */
     public function __invoke(Request $request, string $action = 'index') {
         try {
             $response = $this->handleRequest($request, $action);
@@ -21,14 +27,6 @@ class ApiController extends Controller {
             return ErrorUtils::apiErrorResponse($e->output(), $e->httpCode());
         } catch (NeedRedirectException $e) {
             return redirect($e->url, $e->status);
-        } catch (\Exception $e) {
-            return ErrorUtils::apiErrorResponse(
-                [
-                    'error' => 500,
-                    'message' => $e->getMessage(),
-                    // 'message' => '服务器发生错误了~',
-                    'ext' => '',
-                ], 500);
         }
     }
 
