@@ -16,3 +16,12 @@ use Illuminate\Http\Request;
 Route::middleware('auth:api')->get('/user', function (Request $request) {
     return $request->user();
 });
+
+Route::match(['get', 'post'], '/api/{action?}', 'ApiController');
+
+// V2 API
+Route::match(['get', 'post'], '/v2/book/{action?}', 'BookController');
+// 为了匹配 /v2/isbn/xxx 这样的 url，有更好的方法吗？
+Route::match(['get', 'post'], '/v2/book/isbn/{isbn}', 'BookIsbnController');
+Route::match(['get', 'post'], '/v2/card/{action?}', 'CardController');
+Route::match(['get', 'post'], '/v2/{action?}', 'Api2Controller');
