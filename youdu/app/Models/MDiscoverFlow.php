@@ -12,6 +12,9 @@ namespace App\Models;
  * @property mixed user_id
  * @property mixed status
  * @property mixed create_time
+ * @property-read MUser user
+ * @property-read MBook book
+ * @property-read MCard card
  */
 class MDiscoverFlow extends \Eloquent {
 
@@ -26,4 +29,29 @@ class MDiscoverFlow extends \Eloquent {
     public $timestamps = false;
 
     protected $fillable = ['type', 'content_id', 'user_id', 'status', 'create_time'];
+
+    public function user() {
+        return $this->belongsTo(MUser::class, 'user_id');
+    }
+
+    public function book() {
+        return $this->belongsTo(MBook::class, 'content_id');
+    }
+
+    public function card() {
+        return $this->belongsTo(MCard::class, 'content_id');
+    }
+
+    public static function flow($cursor, $isTop, $count = 40) {
+        $queryBuild = MDiscoverFlow::where(['status' => self::DISCOVER_ITEM_APPROVED]);
+        if (!$isTop) {
+            $cursor = intval($cursor);
+            if ($cursor < 0) {
+                $cursor = 0;
+            }
+            $queryBuild->where('create_time', '<', $cursor);
+        }
+        return $queryBuild->orderByDesc('create_time')
+            ->take($count);
+    }
 }

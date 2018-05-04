@@ -2,17 +2,22 @@
 
 namespace App\Http\Controllers\Api;
 
+use App\Formatters\BookFormatter;
 use App\Formatters\CardFormatter;
 use App\Http\Controllers\Api\Exceptions\Exception;
 use App\Http\Controllers\Api\Lib\Visitor;
+use App\Lib\Activity\ActivityManager;
 use App\Lib\Discover\DiscoverManager;
 use App\Lib\Douban\DoubanManager;
 use App\Lib\Pulp\PulpManager;
 use App\Models\MBook;
 use App\Models\MCard;
 use App\Models\MCardApproval;
+use App\Models\MDiscoverFlow;
 use App\Models\MUser;
+use App\Models\MUserBook;
 use App\Repositories\ChatRepository;
+use App\Repositories\UserRepository;
 use App\Utils\CommonUtils;
 use App\Utils\JsonUtils;
 
@@ -163,7 +168,7 @@ class Card extends ApiBase {
                 'extra'  => $cardId,
             ];
 
-            if (intval($userId) !== intval($card->userId)) {
+            if (intval($userId) !== intval($card->user_id)) {
                 // 给被点赞的同志发一条系统消息
                 ChatRepository::sendSystemMessage(ChatRepository::BOCHA_SYSTEM_USER_ID,
                     $card->user_id,
@@ -277,5 +282,179 @@ class Card extends ApiBase {
             ];
         }
         return $result;
+    }
+
+    public function getBookPageData($isbn, $latitude = 31.181471, $longitude = 121.438378) {
+        $cardList = $this->getBookCards($isbn);
+
+        $userBooks = MUserBook::where(['isbn' => $isbn])->get();
+        $userList = [];
+        foreach ($userBooks as $userBook) {
+            $user = MUser::find($userBook->user_id);
+            if (!$user) {
+                continue;
+            }
+            $addresses = UserRepository::getUserAddresses(
+                $user, $latitude, $longitude, true);
+            $userAddress = array_values($addresses)[0];
+            $distanceText = Visitor::instance()->isMe($userBook->user_id) ? ''
+                : (empty($userAddress) ? '' : CommonUtils::getDistanceString($userAddress['distance']));
+            $userList[] = [
+                'id'           => $user->id,
+                'nickname'     => $user->nickname,
+                'avatar'       => $user->avatar,
+                'address'      => $userAddress,
+                'distanceText' => $distanceText,
+            ];
+        }
+        // sort: 距离升序排列
+        usort($userList, function($a, $b) {
+            if (empty($a['address'])) {
+                return 1;
+            }
+            if (empty($b['address'])) {
+                return -1;
+            }
+            return ($a['address']['distance'] > $b['address']['distance']) ? 1 : -1;
+        });
+
+        return [
+            'users'   => $userList,
+            'cards'   => $cardList,
+            'hasBook' => Visitor::instance()->hasBook($isbn) ? 1 : 0,
+        ];
+    }
+
+    public function getBookCards($isbn, $page = 0, $count = 5) {
+        $cards = MCard::where(['status' => MCard::CARD_STATUS_NORMAL, 'book_isbn' => $isbn])
+            ->orderByDesc('create_time')
+            ->skip($page * $count)
+            ->take($count)
+            ->get();
+
+        $formattedCards = [];
+        foreach ($cards as $card) {
+            /** @var MUser $user */
+            $user = $card->user;
+            if (!$user) {
+                continue;
+            }
+            $formattedCards[] = [
+                'id'            => $card->id,
+                'user'          => [
+                    'id'        => $user->id,
+                    'nickname'  => $user->nickname,
+                    'avatar'    => $user->avatar,
+                ],
+                'title'         => $card->title,
+                'content'       => mb_substr($card->content, 0, 48, 'utf-8'),
+                'picUrl'        => CommonUtils::getListThumbnailUrl($card->pic_url),
+                'createTime'    => $card->create_time,
+                'readCount'     => $card->read_count,
+                'approvalCount' => $card->approvalCount(),
+            ];
+        }
+        return $formattedCards;
+    }
+
+    /*
+     * 第一版出去最简单的卡片流:读书卡片和最新图书混排的流
+     * $cursor 卡片列表的时间戳
+     * $bookCursor 书列表的时间戳
+     * $isUp 下拉或者上拉刷新
+     */
+    public function getDiscoverPageData($cursor, $isTop) {
+        $discoverList = MDiscoverFlow::flow($cursor, $isTop)->get();
+        $resultList = [];
+        /** @var MDiscoverFlow $item */
+        foreach ($discoverList as $item) {
+            if ($item->type === 'card') {
+                $user = $item->user;
+                $card = $item->card;
+                if (!$card && $card->status == MCard::CARD_STATUS_NORMAL) {
+                    $resultList[] = [
+                        'type' => 'card',
+                        'data' => [
+                            'id'            => $card->id,
+                            'user'          => [
+                                'id'        => $user->id,
+                                'nickname'  => $user->nickname,
+                                'avatar'    => $user->avatar,
+                            ],
+                            'title'         => $card->title,
+                            'content'       => mb_substr($card->content, 0, 48, 'utf-8'),
+                            'picUrl'        => CommonUtils::getListThumbnailUrl($card->pic_url),
+                            'createTime'    => $card->create_time,
+                            'readCount'     => intval($card->read_count),
+                            'approvalCount' => $card->approvalCount(),
+                        ],
+                    ];
+                }
+            } else if ($item->type === 'book') {
+                $user = $item->user;
+                $book = $item->book;
+                // TODO 图书去重
+                $duplicate = false;
+                foreach($resultList as $k => $v){
+                    if ($v['type'] === 'book'
+                        && $v['data']['isbn'] === $book->isbn){
+                        $duplicate = true;
+                        break;
+                    }
+                }
+                if (!$duplicate) {
+                    $resultList[] = [
+                        'type' => 'book',
+                        'data' => [
+                            'isbn'         => $book->isbn,
+                            'user'       => [
+                                'id'       => $user->id,
+                                'nickname' => $user->nickname,
+                                'avatar'   => $user->avatar,
+                            ],
+                            'title'      => $book->title,
+                            'author'     => BookFormatter::parseAuthor($book->author),
+                            'cover'      => $book->cover,
+                            'publisher'  => $book->publisher,
+                            'summary'    => mb_substr($book->summary, 0, 96, 'utf-8'),
+                            'createTime' => $item->create_time,
+                        ],
+                    ];
+                }
+            }
+        }
+
+        $topCursor = self::getCursor($resultList, true);
+        $bottomCursor = self::getCursor($resultList, false);
+
+        $banners = [];
+        if ($isTop) {
+            // 活动置顶
+            $banners[] = ActivityManager::createActivityItemOnlyPic2();
+            $banners[] = ActivityManager::createActivityItemOnlyPic();
+            $acBook = ActivityManager::createNewBookItem('27199470', 'https://img01.yit.com/media/3c1f48ed-9032-40d3-87dd-12eee304d675.jpg');
+            if ($acBook !== false) {
+                $banners[] = $acBook;
+            }
+        }
+
+        return [
+            'banner'           => $banners,
+            'list'             => $resultList,
+            'topCursor'        => $topCursor,
+            'bottomCursor'     => $bottomCursor,
+            'bookTopCursor'    => -1, // 结构改了，暂时没有用了
+            'bookBottomCursor' => -1,
+            'showPost'         => true,
+        ];
+    }
+
+    private static function getCursor($list, $isTop) {
+        if (count($list) > 0) {
+            $index = $isTop ? 0 : (count($list) - 1);
+            $item = array_values($list)[$index];
+            return $item['data']['createTime'];
+        }
+        return -1;
     }
 }

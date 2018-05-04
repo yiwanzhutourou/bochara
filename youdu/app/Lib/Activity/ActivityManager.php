@@ -120,7 +120,7 @@ class ActivityManager {
         $response = file_get_contents($url);
         $doubanBook = json_decode($response);
         if ($doubanBook === null || empty($doubanBook->id)) {
-            return [];
+            return false;
         }
 
         $book = new MBook();
