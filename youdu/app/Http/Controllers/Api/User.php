@@ -172,7 +172,7 @@ class User extends ApiBase {
      * @return array
      * @throws Exception
      */
-    public function setUserContact($name, $contact) {
+    public function setUserContact($name = '', $contact = '') {
         $user = Visitor::instance()->checkAuth();
         $userContact = [
             'name'    => $name,
@@ -325,7 +325,7 @@ class User extends ApiBase {
      * @return string
      * @throws Exception
      */
-    public function updateHomeData($nickname, $intro, $avatar) {
+    public function updateHomeData($nickname, $intro = '', $avatar = '') {
         $user = Visitor::instance()->checkAuth();
 
         // 鉴黄
@@ -771,7 +771,7 @@ class User extends ApiBase {
             'book_isbn'  => $book->isbn,
             'book_title' => $book->title,
             'book_cover' => $book->cover,
-            'data'       => $date,
+            'date'       => $date,
             'status'     => MBorrowHistory::BORROW_STATUS_INIT,
             'form_id'    => $formId,
         ]);

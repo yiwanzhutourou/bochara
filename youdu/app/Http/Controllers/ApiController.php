@@ -43,7 +43,7 @@ class ApiController extends Controller {
     private function handleRequest(Request $request, $action) {
         $this->initEnv($request);
 
-        $requestData = $request->input();
+        $requestData = $request->all();
         $method = $request->method();
         $cmd = new ApiCmd($action, $requestData, $method);
         $cmd->run();

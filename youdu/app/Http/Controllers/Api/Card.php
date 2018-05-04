@@ -10,7 +10,6 @@ use App\Lib\Activity\ActivityManager;
 use App\Lib\Discover\DiscoverManager;
 use App\Lib\Douban\DoubanManager;
 use App\Lib\Pulp\PulpManager;
-use App\Models\MBook;
 use App\Models\MCard;
 use App\Models\MCardApproval;
 use App\Models\MDiscoverFlow;
@@ -31,7 +30,7 @@ class Card extends ApiBase {
      * @return mixed
      * @throws Exception
      */
-    public function insertNew($content, $title, $picUrl, $book = '') {
+    public function insertNew($content, $title, $picUrl = '', $book = '') {
         $user = Visitor::instance()->checkAuth();
 
         // 客户端传过来的豆瓣 Book 对象
@@ -85,7 +84,7 @@ class Card extends ApiBase {
      * @return string
      * @throws Exception
      */
-    public function modify($cardId, $content, $title, $picUrl, $picModified) {
+    public function modify($cardId, $content, $title, $picUrl = '', $picModified = false) {
         $user = Visitor::instance()->checkAuth();
         $userId = $user->id;
         if (PulpManager::checkPulp($picUrl, [
@@ -129,9 +128,12 @@ class Card extends ApiBase {
             throw new Exception(Exception::RESOURCE_NOT_FOUND, '读书卡片不存在~');
         }
         $card->status = MCard::CARD_STATUS_DELETED;
-        // 将卡片从发现流中删除
-        DiscoverManager::removeCardFromDiscoverFlow($cardId, $user->id);
-        return 'ok';
+        if ($card->update()) {
+            // 将卡片从发现流中删除
+            DiscoverManager::removeCardFromDiscoverFlow($cardId, $user->id);
+            return 'ok';
+        }
+        throw new Exception(Exception::INTERNAL_ERROR , '操作失败请稍后重试~');
     }
 
     /**
@@ -371,7 +373,7 @@ class Card extends ApiBase {
             if ($item->type === 'card') {
                 $user = $item->user;
                 $card = $item->card;
-                if (!$card && $card->status == MCard::CARD_STATUS_NORMAL) {
+                if ($card && $card->status == MCard::CARD_STATUS_NORMAL) {
                     $resultList[] = [
                         'type' => 'card',
                         'data' => [

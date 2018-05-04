@@ -89,7 +89,7 @@ class Chat extends ApiBase {
             'book_isbn'  => $book->isbn,
             'book_title' => $book->title,
             'book_cover' => $book->cover,
-            'data'       => $date,
+            'date'       => $date,
             'status'     => MBorrowHistory::BORROW_STATUS_INIT,
             'form_id'    => '',
         ]);
@@ -269,7 +269,7 @@ class Chat extends ApiBase {
             . " or (user_1 = {$otherId} and user_2 = {$selfId} and status_2 = 0))"
             . " and (timestamp > {$timestamp}))";
         $messages = MChatMessage::whereRaw($queryString)
-            ->orderBy('timestamp')
+            ->orderByDesc('timestamp')
             ->get();
 
         $formattedMessages = [];
@@ -277,7 +277,7 @@ class Chat extends ApiBase {
             $formattedMessages[] = ChatRepository::createMessage($message);
         }
 
-        return $formattedMessages;
+        return array_reverse($formattedMessages);
     }
 
     /**
@@ -306,7 +306,7 @@ class Chat extends ApiBase {
         $queryString = "((user_1 = {$selfId} and user_2 = {$otherId} and status_1 = 0)"
             . " or (user_1 = {$otherId} and user_2 = {$selfId} and status_2 = 0))";
         $messages = MChatMessage::whereRaw($queryString)
-            ->orderBy('timestamp')
+            ->orderByDesc('timestamp')
             ->skip($offset)
             ->take($count)
             ->get();
@@ -315,10 +315,11 @@ class Chat extends ApiBase {
         foreach ($messages as $message) {
             $formattedMessages[] = ChatRepository::createMessage($message);
         }
+        $formattedMessages = array_reverse($formattedMessages);
 
         if (intval($page) === 0 && intval($otherId) !== ChatRepository::BOCHA_SYSTEM_USER_ID) {
             // 所有聊天开始默认推一条 hint
-            $messages[] = ChatRepository::createFakeMessage();
+            $formattedMessages[] = ChatRepository::createFakeMessage();
         }
 
         // clear unread count
@@ -335,7 +336,7 @@ class Chat extends ApiBase {
                 'nickname' => $otherUser->nickname,
                 'avatar'   => $otherUser->avatar,
             ],
-            'messages'  => $messages,
+            'messages'  => $formattedMessages,
             'timestamp' => time(),
         ];
     }

@@ -202,7 +202,25 @@ class ChatRepository {
                     'timeStamp' => $message->timestamp,
                 ];
             case MChatMessage::MSG_TYPE_BORROW:
+                $extra = json_decode($message->extra);
+                return [
+                    'type'      => 'request',
+                    'from'      => $message->user_1,
+                    'to'        => $message->user_2,
+                    'content'   => $message->msg_content,
+                    'timeStamp' => $message->timestamp,
+                    'extra'     => $extra,
+                ];
             case MChatMessage::MSG_TYPE_CONTACT:
+                $extra = json_decode($message->extra);
+                return [
+                    'type'      => 'contact',
+                    'from'      => $message->user_1,
+                    'to'        => $message->user_2,
+                    'content'   => $message->msg_content,
+                    'timeStamp' => $message->timestamp,
+                    'extra'     => $extra,
+                ];
             case MChatMessage::MSG_TYPE_SYSTEM:
                 $extra = json_decode($message->extra);
                 return [
