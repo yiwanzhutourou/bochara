@@ -49,7 +49,7 @@ class Chat extends ApiBase {
      * @return string
      * @throws Exception
      */
-    public function borrowBook($toUser, $isbn, $message) {
+    public function borrowBook($toUser, $isbn, $message = '') {
         $self = Visitor::instance()->checkAuth();
         if (intval($toUser) === $self->id) {
             throw new Exception(Exception::BAD_REQUEST , '不可以借自己的书哦~');
