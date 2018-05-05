@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Controllers\Api\Exceptions\ApiException;
 use App\Http\Controllers\Api\Exceptions\Exception;
 use App\Http\Controllers\Api\Exceptions\NeedRedirectException;
 use App\Http\Controllers\Api\Lib\ApiCmd;
@@ -27,6 +28,12 @@ class ApiController extends Controller {
             return ErrorUtils::apiErrorResponse($e->output(), $e->httpCode());
         } catch (NeedRedirectException $e) {
             return redirect($e->url, $e->status);
+        } catch (ApiException $e) {
+            // report to sentry
+            if (app()->bound('sentry')) {
+                app('sentry')->captureException($e);
+            }
+            return ErrorUtils::apiErrorResponse($e->output(), $e->httpCode());
         }
     }
 
@@ -35,6 +42,7 @@ class ApiController extends Controller {
      * @param         $action
      * @return array
      * @throws Exception
+     * @throws ApiException
      * @throws NeedRedirectException
      * @throws \Exception
      */

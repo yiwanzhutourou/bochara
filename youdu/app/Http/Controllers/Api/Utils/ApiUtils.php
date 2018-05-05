@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Api\Utils;
 
 use App\Http\Controllers\Api\ApiBase;
+use App\Http\Controllers\Api\Exceptions\ApiException;
 use App\Http\Controllers\Api\Exceptions\Exception;
 
 class ApiUtils {
@@ -11,7 +12,7 @@ class ApiUtils {
      * @param      $data
      * @param null $callContext
      * @return mixed
-     * @throws Exception
+     * @throws ApiException
      * @throws \Exception
      */
     public static function api($api_name, $data, $callContext = null) {
@@ -21,21 +22,18 @@ class ApiUtils {
 
         // check class
         $api = self::apiCheckClass($class);
-        if (!$api) throw new Exception(Exception::INVALID_COMMAND, "非api接口，不能调用：{$className}");
+        if (!$api) throw new ApiException(Exception::INVALID_COMMAND, "非api接口，不能调用：{$className}");
 
         // check method
         $method = self::apiCheckMethod($api, $method);
-        if (!$method) throw new Exception(Exception::INVALID_COMMAND, "api接口不存在此方法，不能调用：{$className}.{$method}");
+        if (!$method) throw new ApiException(Exception::INVALID_COMMAND, "api接口不存在此方法，不能调用：{$className}.{$method}");
 
         self::apiCheckRequestMethod($api, $method, $callContext);
         $callPars = self::apiCheckParams($api, $method, $data);
 
-        try {
-            $result = call_user_func_array([$api, $method], $callPars);
-            return $result;
-        } catch (Exception $e) {
-            throw new Exception($e->getCode(), $e->getMessage());
-        }
+        $result = call_user_func_array([$api, $method], $callPars);
+        return $result;
+
     }
 
     private static function apiCheckClass($className) {
@@ -64,7 +62,7 @@ class ApiUtils {
             if (!empty($annotates['method'])) {
                 $expectMethod = strtoupper($annotates['method'][0]);
                 if (strtoupper($callContext['method']) != $expectMethod) {
-                    throw new \Exception("api接口" . get_class($api) . ".{$method}请使用{$expectMethod}请求");
+                    throw new ApiException("api接口" . get_class($api) . ".{$method}请使用{$expectMethod}请求");
                 }
             }
         }
@@ -76,8 +74,8 @@ class ApiUtils {
      * @param $method
      * @param $data
      * @return array
-     * @throws Exception
      * @throws \ReflectionException
+     * @throws ApiException
      */
     private static function apiCheckParams($api, $method, $data) {
         $pars = (new \ReflectionMethod($api, $method))->getParameters();
@@ -91,7 +89,7 @@ class ApiUtils {
             } elseif ($eachPar->isDefaultValueAvailable()) {
                 $callPars[] = $eachPar->getDefaultValue();
             } else {
-                throw new Exception(Exception::PARAMETERS_MISSING, $key);
+                throw new ApiException(Exception::PARAMETERS_MISSING, '缺少参数：' . $key);
             }
             unset($data[$key]);
         }

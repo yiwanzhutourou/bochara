@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Api\Lib;
 
+use App\Http\Controllers\Api\Exceptions\ApiException;
 use App\Http\Controllers\Api\Exceptions\Exception;
 use App\Http\Controllers\Api\Utils\ApiUtils;
 
@@ -40,7 +41,7 @@ class ApiCmd {
 
     /**
      * @return mixed|null
-     * @throws Exception
+     * @throws ApiException
      * @throws \Exception
      */
     public function run() {
@@ -51,7 +52,7 @@ class ApiCmd {
 
     /**
      * @return mixed
-     * @throws Exception
+     * @throws ApiException
      * @throws \Exception
      */
     private function runApi() {
