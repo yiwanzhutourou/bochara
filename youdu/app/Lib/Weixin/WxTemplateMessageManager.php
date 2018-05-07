@@ -2,6 +2,8 @@
 
 namespace App\Lib\Weixin;
 
+use App\Lib\HttpClient\HttpClient;
+
 class WxTemplateMessageManager {
 
     public static function sendDeclineBorrowBookMessage(
@@ -70,29 +72,20 @@ class WxTemplateMessageManager {
             // TODO 微信模板消息发失败显然不能往客户端抛错，记录下 Log
             return false;
         }
-        $url = "https://api.weixin.qq.com/cgi-bin/message/wxopen/template/send?access_token={$access_token}";
-        $data = [
-            'touser'           => $toUserOpenId,
-            'template_id'      => $templateId,
-            'page'             => $page,
-            'form_id'          => $formId,
-            'data'             => $data,
-            'emphasis_keyword' => $keyword,
-        ];
-
-        $options = [
-            'http' => [
-                'header'  => "Content-type:application/json",
-                'method'  => 'POST',
-                'content' => json_encode($data, true),
-                'timeout' => 60,
+        $url = "https://api.weixin.qq.com/cgi-bin/message/wxopen/template/send";
+        $result = HttpClient::post($url, [
+            'query'   => ['access_token' => $access_token],
+            'json'    => [
+                'touser'           => $toUserOpenId,
+                'template_id'      => $templateId,
+                'page'             => $page,
+                'form_id'          => $formId,
+                'data'             => $data,
+                'emphasis_keyword' => $keyword,
             ],
-        ];
-
-        $context  = stream_context_create($options);
-        $result = file_get_contents($url, false, $context);
-
-        if ($result === false) {
+            'timeout' => 60,
+        ]);
+        if (!$result) {
             return false;
         }
 
