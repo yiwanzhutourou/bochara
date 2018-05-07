@@ -3,6 +3,7 @@
 namespace App\Lib\Activity;
 
 use App\Lib\Douban\DoubanManager;
+use App\Lib\HttpClient\HttpClient;
 use App\Models\MArticle;
 use App\Models\MBook;
 use App\Models\MCard;
@@ -117,19 +118,19 @@ class ActivityManager {
         }
 
         $url = "https://api.douban.com/v2/book/{$isbn}";
-        $response = file_get_contents($url);
+        $response = HttpClient::get($url);
         $doubanBook = json_decode($response);
         if ($doubanBook === null || empty($doubanBook->id)) {
-            return false;
+            return null;
         }
 
         $book = DoubanManager::copy($doubanBook);
         return [
             'type' => 'book',
             'data' => [
-                'id'            => $book->isbn,
-                'title'         => "{$label}: {$book->title}",
-                'picUrl'        => $bookPic,
+                'id'     => $book->isbn,
+                'title'  => "{$label}: {$book->title}",
+                'picUrl' => $bookPic,
             ],
         ];
     }

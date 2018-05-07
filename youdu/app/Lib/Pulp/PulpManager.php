@@ -2,6 +2,7 @@
 
 namespace App\Lib\Pulp;
 
+use App\Lib\HttpClient\HttpClient;
 use App\Models\MCardPulp;
 
 class PulpManager {
@@ -16,7 +17,7 @@ class PulpManager {
             return false;
         }
         $url = $picUrl . '?pulp';
-        $response = file_get_contents($url);
+        $response = HttpClient::get($url);
         $pulp = json_decode($response);
         // 没解出数据认为是正常的
         if (!$pulp || !$pulp->pulp) {

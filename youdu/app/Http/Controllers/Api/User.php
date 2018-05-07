@@ -9,6 +9,7 @@ use App\Http\Controllers\Api\Lib\Visitor;
 use App\Lib\Baidu\BaiduPoiManager;
 use App\Lib\Discover\DiscoverManager;
 use App\Lib\Douban\DoubanManager;
+use App\Lib\HttpClient\HttpClient;
 use App\Lib\Pulp\PulpManager;
 use App\Lib\SMS\AliSmsSender;
 use App\Lib\Weixin\WxTemplateMessageManager;
@@ -37,14 +38,13 @@ class User extends ApiBase {
      * @throws Exception
      */
     public function login($code, $nickname, $avatar = '') {
-        $url = "https://api.weixin.qq.com/sns/jscode2session?" . http_build_query([
-                'appid'      => env('WX_APP_ID'),
-                'secret'     => env('WX_SECRET'),
-                'js_code'    => $code,
-                'grant_type' => 'authorization_code'
-            ]);
-
-        $response = json_decode(file_get_contents($url));
+        $url = "https://api.weixin.qq.com/sns/jscode2session";
+        $response = json_decode(HttpClient::get($url, [
+            'appid'      => env('WX_APP_ID'),
+            'secret'     => env('WX_SECRET'),
+            'js_code'    => $code,
+            'grant_type' => 'authorization_code',
+        ]));
         if (!empty($response->errcode)) {
             throw new Exception(Exception::WEIXIN_AUTH_FAILED, '微信验证出错:'.$response->errmsg);
         }
@@ -434,23 +434,6 @@ class User extends ApiBase {
         $doubanBook = json_decode($book);
         $this->addBookFromDoubanBook($doubanBook);
         return 'ok';
-    }
-
-    /**
-     * 挪到客户端了,可以删了
-     *
-     * @param $isbn
-     * @return mixed
-     * @throws Exception
-     */
-    public function addBook($isbn) {
-        Visitor::instance()->checkAuth();
-        // check book in Douban
-        $url = "https://api.douban.com/v2/book/{$isbn}";
-        $response = file_get_contents($url);
-        $doubanBook = json_decode($response);
-        $this->addBookFromDoubanBook($doubanBook);
-        return $isbn;
     }
 
     /**

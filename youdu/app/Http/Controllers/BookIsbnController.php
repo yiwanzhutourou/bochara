@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Formatters\DoubanFormatter;
 use App\Http\Controllers\Api\Exceptions\Exception;
 use App\Lib\Douban\DoubanManager;
+use App\Lib\HttpClient\HttpClient;
 use App\Models\MBook;
 use App\Utils\ErrorUtils;
 use Illuminate\Http\Request;
@@ -25,8 +26,7 @@ class BookIsbnController extends Controller {
         if (!$book || empty($book->price)) {
             // check book in Douban
             $url = "https://api.douban.com/v2/book/isbn/{$isbn}";
-            $response = file_get_contents($url);
-
+            $response = HttpClient::get($url);
             $doubanBook = json_decode($response);
             if ($doubanBook === null || empty($doubanBook->id)) {
                 return ErrorUtils::errorResponse('无法获取图书信息',

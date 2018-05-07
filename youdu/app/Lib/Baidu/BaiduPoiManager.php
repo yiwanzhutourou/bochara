@@ -2,6 +2,7 @@
 
 namespace App\Lib\Baidu;
 
+use App\Lib\HttpClient\HttpClient;
 use App\Utils\JsonUtils;
 
 class BaiduPoiManager {
@@ -14,14 +15,13 @@ class BaiduPoiManager {
      * @return array|mixed
      */
     public static function reversePoi($lat, $lng) {
-        $url = "http://api.map.baidu.com/geocoder/v2/?"
-            . http_build_query([
-                'location' => $lat.','.$lng,
-                'output'   => 'json',
-                'pois'     => 1,
-                'ak'       => env('BAIDU_MAP_AK'),
-            ]);
-        $response = file_get_contents($url);
+        $url = "http://api.map.baidu.com/geocoder/v2/";
+        $response = HttpClient::get($url, [
+            'location' => $lat.','.$lng,
+            'output'   => 'json',
+            'pois'     => 1,
+            'ak'       => env('BAIDU_MAP_AK'),
+        ]);
         $location = json_decode($response);
         if ($location !== null && $location->status === 0) {
             if (!empty($location->result)) {

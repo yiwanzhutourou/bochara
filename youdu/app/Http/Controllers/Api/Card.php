@@ -435,7 +435,7 @@ class Card extends ApiBase {
             $banners[] = ActivityManager::createActivityItemOnlyPic2();
             $banners[] = ActivityManager::createActivityItemOnlyPic();
             $acBook = ActivityManager::createNewBookItem('27199470', 'https://img01.yit.com/media/3c1f48ed-9032-40d3-87dd-12eee304d675.jpg');
-            if ($acBook !== false) {
+            if ($acBook) {
                 $banners[] = $acBook;
             }
         }

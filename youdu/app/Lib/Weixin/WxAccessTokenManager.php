@@ -3,6 +3,7 @@
 namespace App\Lib\Weixin;
 
 use App\Http\Controllers\Api\Exceptions\Exception;
+use App\Lib\HttpClient\HttpClient;
 use App\Models\MXu;
 
 class WxAccessTokenManager {
@@ -40,14 +41,12 @@ class WxAccessTokenManager {
                 return $this->access_token;
             }
 
-            // TODO 找一个打接口的库？
-            $url = "https://api.weixin.qq.com/cgi-bin/token?" . http_build_query([
-                    'grant_type' => 'client_credential',
-                    'appid'      => env('WX_APP_ID'),
-                    'secret'     => env('WX_SECRET'),
-                ]);
-
-            $response = json_decode(file_get_contents($url));
+            $url = "https://api.weixin.qq.com/cgi-bin/token";
+            $response = json_decode(HttpClient::get($url, [
+                'grant_type' => 'client_credential',
+                'appid'      => env('WX_APP_ID'),
+                'secret'     => env('WX_SECRET'),
+            ]));
             if (!empty($response->errcode)) {
                 // TODO log 一下错误
                 return false;
