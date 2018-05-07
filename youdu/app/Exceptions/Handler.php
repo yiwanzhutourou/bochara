@@ -53,4 +53,12 @@ class Handler extends ExceptionHandler
     {
         return parent::render($request, $exception);
     }
+
+    public function shouldReport(Exception $e)
+    {
+        if (env('APP_ENV') === 'production') {
+            return parent::shouldReport($e);
+        }
+        return false;
+    }
 }

@@ -7,6 +7,7 @@ use App\Http\Controllers\Api\Exceptions\Exception;
 use App\Http\Controllers\Api\Exceptions\NeedRedirectException;
 use App\Http\Controllers\Api\Lib\ApiCmd;
 use App\Http\Controllers\Api\Lib\Visitor;
+use App\Lib\SentryHelper;
 use App\Models\MUser;
 use App\Utils\ErrorUtils;
 use Illuminate\Http\Request;
@@ -30,9 +31,7 @@ class ApiController extends Controller {
             return redirect($e->url, $e->status);
         } catch (ApiException $e) {
             // report to sentry
-            if (app()->bound('sentry')) {
-                app('sentry')->captureException($e);
-            }
+            SentryHelper::report($e);
             return ErrorUtils::apiErrorResponse($e->output(), $e->httpCode());
         }
     }
