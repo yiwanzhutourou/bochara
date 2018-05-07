@@ -36,7 +36,7 @@ class User extends ApiBase {
      * @return array
      * @throws Exception
      */
-    public function login($code, $nickname, $avatar) {
+    public function login($code, $nickname, $avatar = '') {
         $url = "https://api.weixin.qq.com/sns/jscode2session?" . http_build_query([
                 'appid'      => env('WX_APP_ID'),
                 'secret'     => env('WX_SECRET'),
