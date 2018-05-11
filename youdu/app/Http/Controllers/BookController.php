@@ -23,7 +23,7 @@ class BookController extends Controller {
 
     public function getByIsbn($isbn) {
         $book = MBook::find($isbn);
-        if (!$book || empty($book->price)) {
+        if (!$book || !$book->price) {
             // check book in Douban
             $url = "https://api.douban.com/v2/book/{$isbn}";
             $response = HttpClient::get($url);
