@@ -2,8 +2,10 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Controllers\Api\Exceptions\ApiException;
 use App\Http\Controllers\Api\Exceptions\Exception;
 use App\Lib\HttpClient\HttpClient;
+use App\Lib\SentryHelper;
 use App\Lib\Weixin\WxAccessTokenManager;
 use App\Utils\ErrorUtils;
 use Illuminate\Http\Request;
@@ -25,7 +27,6 @@ class Api2Controller extends Controller {
     /**
      * @param Request $request
      * @return mixed
-     * @throws Exception
      */
     public function getQRCode(Request $request) {
         $page = $request->input('page') ?? '/pages/index/index';
