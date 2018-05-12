@@ -49,7 +49,7 @@ class Api2Controller extends Controller {
                 }
                 $result = $this->getQRCodeFromWeixin($accessToken, $page);
                 $json = json_decode($result);
-                if (!empty($json->errcode) || $json->errcode > 0) {
+                if ($json && !empty($json->errcode) || $json->errcode > 0) {
                     SentryHelper::report(new ApiException($json->errcode, $result));
                     return ErrorUtils::errorResponse('无法生成二维码', Exception::WEIXIN_RETURN_FAILED);
                 }

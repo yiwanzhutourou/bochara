@@ -91,7 +91,7 @@ class WxTemplateMessageManager {
                     return false;
                 }
                 $json = json_decode($result);
-                if (!empty($json->errcode) || $json->errcode > 0) {
+                if ($json && !empty($json->errcode) || $json->errcode > 0) {
                     SentryHelper::report(new ApiException($json->errcode, $result));
                     return false;
                 }
