@@ -2,8 +2,9 @@
 
 namespace App\Lib\Weixin;
 
-use App\Http\Controllers\Api\Exceptions\Exception;
+use App\Http\Controllers\Api\Exceptions\ApiException;
 use App\Lib\HttpClient\HttpClient;
+use App\Lib\SentryHelper;
 use App\Models\MXu;
 
 class WxAccessTokenManager {
@@ -25,47 +26,53 @@ class WxAccessTokenManager {
     }
 
     /**
+     * @param bool $skipCache
      * @return string|bool
      */
-    public function getAccessToken() {
-        if (!empty($this->access_token) && $this->tokenValid()) {
-            return $this->access_token;
-        }
-
-        // TODO 改用 Redis
-        $xu = MXu::where(['name' => self::TOKEN_KEY])->first();
-        if ($xu) {
-            $this->access_token = $xu->value;
-            $this->expire_time = $xu->expire_time;
+    public function getAccessToken($skipCache = false) {
+        if (!$skipCache) {
             if (!empty($this->access_token) && $this->tokenValid()) {
                 return $this->access_token;
             }
 
-            $url = "https://api.weixin.qq.com/cgi-bin/token";
-            $response = json_decode(HttpClient::get($url, [
-                'grant_type' => 'client_credential',
-                'appid'      => env('WX_APP_ID'),
-                'secret'     => env('WX_SECRET'),
-            ]));
-            if (!empty($response->errcode)) {
-                // TODO log 一下错误
-                return false;
-            }
-
-            if (!empty($response->access_token)) {
-                $this->access_token = $response->access_token;
-                $this->expire_time = time() + $response->expires_in - 300;
-
-                MXu::updateOrInsert(['name' => self::TOKEN_KEY],
-                    [
-                        'value' => $this->access_token,
-                        'create_time' => time(),
-                        'expire_time' => $this->expire_time,
-                    ]);
-
-                return $this->access_token;
+            // TODO 改用 Redis
+            $xu = MXu::where(['name' => self::TOKEN_KEY])->first();
+            if ($xu) {
+                $this->access_token = $xu->value;
+                $this->expire_time = $xu->expire_time;
+                if (!empty($this->access_token) && $this->tokenValid()) {
+                    return $this->access_token;
+                }
             }
         }
+
+        // get access token from weixin
+        $url = "https://api.weixin.qq.com/cgi-bin/token";
+        $responseJson = HttpClient::get($url, [
+            'grant_type' => 'client_credential',
+            'appid'      => env('WX_APP_ID'),
+            'secret'     => env('WX_SECRET'),
+        ]);
+        $response = json_decode($responseJson);
+        if (!empty($response->errcode)) {
+            SentryHelper::report(new ApiException($response->errcode, $responseJson));
+            return false;
+        }
+
+        if (!empty($response->access_token)) {
+            $this->access_token = $response->access_token;
+            $this->expire_time = time() + $response->expires_in - 300;
+
+            MXu::updateOrInsert(['name' => self::TOKEN_KEY],
+                [
+                    'value' => $this->access_token,
+                    'create_time' => time(),
+                    'expire_time' => $this->expire_time,
+                ]);
+
+            return $this->access_token;
+        }
+
         return false;
     }
 

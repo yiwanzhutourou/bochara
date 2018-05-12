@@ -2,7 +2,9 @@
 
 namespace App\Lib\Weixin;
 
+use App\Http\Controllers\Api\Exceptions\ApiException;
 use App\Lib\HttpClient\HttpClient;
+use App\Lib\SentryHelper;
 
 class WxTemplateMessageManager {
 
@@ -69,11 +71,41 @@ class WxTemplateMessageManager {
         $page, $formId, $data = [], $keyword) {
         $access_token = WxAccessTokenManager::instance()->getAccessToken();
         if ($access_token === false) {
-            // TODO 微信模板消息发失败显然不能往客户端抛错，记录下 Log
             return false;
         }
+
+        $result = self::sendToWeixin($access_token, $toUserOpenId, $templateId,
+            $page, $formId, $data, $keyword);
+        if (!$result) {
+            return false;
+        }
+
+        $json = json_decode($result);
+        if (!empty($json->errcode) || $json->errcode > 0) {
+            // 线上环境清空token重试一次
+            if (env('APP_ENV') === 'production') {
+                $access_token = WxAccessTokenManager::instance()->getAccessToken(true);
+                $result = self::sendToWeixin($access_token, $toUserOpenId, $templateId,
+                    $page, $formId, $data, $keyword);
+                if (!$result) {
+                    return false;
+                }
+                $json = json_decode($result);
+                if (!empty($json->errcode) || $json->errcode > 0) {
+                    SentryHelper::report(new ApiException($json->errcode, $result));
+                    return false;
+                }
+            }
+            return false;
+        }
+
+        return true;
+    }
+
+    private static function sendToWeixin($access_token, $toUserOpenId, $templateId,
+                                         $page, $formId, $data, $keyword) {
         $url = "https://api.weixin.qq.com/cgi-bin/message/wxopen/template/send";
-        $result = HttpClient::post($url, [
+        return HttpClient::post($url, [
             'query'   => ['access_token' => $access_token],
             'json'    => [
                 'touser'           => $toUserOpenId,
@@ -85,15 +117,5 @@ class WxTemplateMessageManager {
             ],
             'timeout' => 60,
         ]);
-        if (!$result) {
-            return false;
-        }
-
-        $json = json_decode($result);
-        if (!empty($json->errcode) || $json->errcode > 0) {
-            return false;
-        }
-
-        return true;
     }
 }
