@@ -81,7 +81,7 @@ class WxTemplateMessageManager {
         }
 
         $json = json_decode($result);
-        if (!empty($json->errcode) || $json->errcode > 0) {
+        if ($json && (!empty($json->errcode) || $json->errcode > 0)) {
             // 线上环境清空token重试一次
             if (env('APP_ENV') === 'production') {
                 $access_token = WxAccessTokenManager::instance()->getAccessToken(true);

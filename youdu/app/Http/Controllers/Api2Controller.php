@@ -40,7 +40,7 @@ class Api2Controller extends Controller {
         }
 
         $json = json_decode($result);
-        if (!empty($json->errcode) || $json->errcode > 0) {
+        if ($json && (!empty($json->errcode) || $json->errcode > 0)) {
             // 线上环境清空token重试一次
             if (env('APP_ENV') === 'production') {
                 $accessToken = WxAccessTokenManager::instance()->getAccessToken(true);
