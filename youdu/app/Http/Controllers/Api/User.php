@@ -311,7 +311,7 @@ class User extends ApiBase {
      * @return mixed
      * @throws Exception
      */
-    public function setInfo($info) {
+    public function setInfo($info = '') {
         $user = Visitor::instance()->checkAuth();
         MUserInfo::updateOrInsert(['user_id' => $user->id],
             ['info' => $info]);
