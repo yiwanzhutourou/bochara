@@ -183,7 +183,7 @@ class ChatRepository {
         $systemUser = new MUser();
         $systemUser->id = self::BOCHA_SYSTEM_USER_ID;
         $systemUser->nickname = '有读书房';
-        $systemUser->avatar = 'http://othb16dht.bkt.clouddn.com/Fm3qYpsmNFGRDbWeTOQDRDfiJz9l?imageView2/1/w/640/h/640/format/jpg/q/75|imageslim';
+        $systemUser->avatar = 'http://pic.youdushufang.com/Fm3qYpsmNFGRDbWeTOQDRDfiJz9l?imageView2/1/w/640/h/640/format/jpg/q/75|imageslim';
         return $systemUser;
     }
 

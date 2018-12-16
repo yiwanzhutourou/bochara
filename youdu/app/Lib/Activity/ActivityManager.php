@@ -18,15 +18,15 @@ class ActivityManager {
     const ACTIVITY_CARD_TITLE = '';
     const ACTIVITY_CARD_DETAIL_TITLE = '';
     const ACTIVITY_CARD_CONTENT = '';
-    const ACTIVITY_CARD_PIC = 'http://othb16dht.bkt.clouddn.com/zhonshanhuodong2.jpeg';
-    const ACTIVITY_CARD_BANNER_PIC = 'http://othb16dht.bkt.clouddn.com/zhongshanhuodong1.png?imageView2/0/format/jpg/q/75|imageslim';
+    const ACTIVITY_CARD_PIC = 'http://pic.youdushufang.com/zhonshanhuodong2.jpeg';
+    const ACTIVITY_CARD_BANNER_PIC = 'http://pic.youdushufang.com/zhongshanhuodong1.png?imageView2/0/format/jpg/q/75|imageslim';
 
     const ACTIVITY_CARD_ID_2 = 2;
     const ACTIVITY_CARD_TITLE_2 = '';
     const ACTIVITY_CARD_DETAIL_TITLE_2 = '';
     const ACTIVITY_CARD_CONTENT_2 = '';
-    const ACTIVITY_CARD_PIC_2 = 'http://othb16dht.bkt.clouddn.com/gongyue2.jpeg?imageView2/0/format/jpg/q/75|imageslim';
-    const ACTIVITY_CARD_BANNER_PIC_2 = 'http://othb16dht.bkt.clouddn.com/gongyue1.jpeg?imageView2/0/format/jpg/q/75|imageslim';
+    const ACTIVITY_CARD_PIC_2 = 'http://pic.youdushufang.com/gongyue2.jpeg?imageView2/0/format/jpg/q/75|imageslim';
+    const ACTIVITY_CARD_BANNER_PIC_2 = 'http://pic.youdushufang.com/gongyue1.jpeg?imageView2/0/format/jpg/q/75|imageslim';
 
     public static function createActivityItemOnlyPic() {
         return [
@@ -145,7 +145,7 @@ class ActivityManager {
             'user'          => [
                 'id'       => self::BOCHA_ACTIVITY_USER_ID,
                 'nickname' => '有读书房',
-                'avatar'   => 'http://othb16dht.bkt.clouddn.com/Fm3qYpsmNFGRDbWeTOQDRDfiJz9l?imageView2/1/w/640/h/640/format/jpg/q/75|imageslim',
+                'avatar'   => 'http://pic.youdushufang.com/Fm3qYpsmNFGRDbWeTOQDRDfiJz9l?imageView2/1/w/640/h/640/format/jpg/q/75|imageslim',
             ],
             'title'         => self::ACTIVITY_CARD_DETAIL_TITLE,
             'content'       => self::ACTIVITY_CARD_CONTENT,
@@ -162,7 +162,7 @@ class ActivityManager {
             'user'          => [
                 'id'       => self::BOCHA_ACTIVITY_USER_ID,
                 'nickname' => '有读书房',
-                'avatar'   => 'http://othb16dht.bkt.clouddn.com/Fm3qYpsmNFGRDbWeTOQDRDfiJz9l?imageView2/1/w/640/h/640/format/jpg/q/75|imageslim',
+                'avatar'   => 'http://pic.youdushufang.com/Fm3qYpsmNFGRDbWeTOQDRDfiJz9l?imageView2/1/w/640/h/640/format/jpg/q/75|imageslim',
             ],
             'title'         => self::ACTIVITY_CARD_DETAIL_TITLE_2,
             'content'       => self::ACTIVITY_CARD_CONTENT_2,
