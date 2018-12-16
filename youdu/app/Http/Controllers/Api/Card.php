@@ -284,6 +284,46 @@ class Card extends ApiBase {
         return $result;
     }
 
+    public function getBookPageDataNew($isbn, $latitude = 31.181471, $longitude = 121.438378) {
+        $userBooks = MUserBook::where(['isbn' => $isbn])->get();
+        $userList = [];
+        foreach ($userBooks as $userBook) {
+            $user = MUser::find($userBook->user_id);
+            if (!$user) {
+                continue;
+            }
+            $addresses = UserRepository::getUserAddresses(
+                $user, $latitude, $longitude, true);
+            $userAddress = array_values($addresses)[0] ?? null;
+            $distanceText = Visitor::instance()->isMe($userBook->user_id) ? ''
+                : ($userAddress ? CommonUtils::getDistanceString($userAddress['distance']) : '');
+            $userList[] = [
+                'id'           => $user->id,
+                'nickname'     => $user->nickname,
+                'avatar'       => $user->avatar,
+                'address'      => $userAddress,
+                'distanceText' => $distanceText,
+            ];
+        }
+        if (count($userList) > 1) {
+            // sort: 距离升序排列
+            usort($userList, function($a, $b) {
+                if (empty($a['address'])) {
+                    return 1;
+                }
+                if (empty($b['address'])) {
+                    return -1;
+                }
+                return ($a['address']['distance'] > $b['address']['distance']) ? 1 : -1;
+            });
+        }
+
+        return [
+            'users'   => $userList,
+            'hasBook' => Visitor::instance()->hasBook($isbn) ? 1 : 0,
+        ];
+    }
+
     public function getBookPageData($isbn, $latitude = 31.181471, $longitude = 121.438378) {
         $cardList = $this->getBookCards($isbn);
 
